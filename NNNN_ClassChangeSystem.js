@@ -948,30 +948,18 @@
     //-----------------------------------------------------------------------------
     // Utility Functions / 工具函數 / ユーティリティ関数
     //-----------------------------------------------------------------------------
-    function getClassName(actor,classData,checkFalse){
+    function getClassName(actor,classData,checkResult){
         if(!classData){
             return '';
         }
-        if(checkFalse === undefined || checkFalse === null){
+        if(checkResult === undefined || checkResult === null){
             const check = checkClassChangeConditions(actor, classData.id);
-            checkFalse = check.some(check => !check.canChange);
+            checkResult = check.some(check => !check.canChange);
         }
-        if(hideUnchangeableClassName && checkFalse){
+        if(hideUnchangeableClassName && !checkResult){
             return unchangeableClassNameReplacement??'';
         }
         return classData.name;
-    }
-    function getDescription(actor,classData){
-        if(!classData){
-            return '';
-        }
-        const description = classList.filter(data => data.Class == classData.id)[0].Description;
-        const check = checkClassChangeConditions(actor, classData.id);
-        const checkFalse = check.some(check => !check.canChange);
-        if(hideUnchangeableClassDescription && checkFalse){
-                return unchangeableClassNameReplacement??'';
-        }
-        return description;
     }
 
     function getClassConditions(classId) {
@@ -1081,6 +1069,14 @@
         };
         return valueMap[paramKey] || 0;
     };
+    function checkConditionResult(actor,classId,checkResult){
+        if(!checkResult){
+            checkResult = checkClassChangeConditions(actor,classId);
+        }
+        const checkFalse = checkResult.some(c => !c.canChange);
+        return !checkFalse;
+    }
+
     function checkClassChangeConditions(actor, targetClassId) {
         const targetClass = $dataClasses[targetClassId];
         let finalResult = [];
@@ -1666,14 +1662,15 @@
         onClassOk() {
             selectedClass = this._classListWindow.item();
             if (selectedClass) {
-                const check = checkClassChangeConditions(selectedActor, selectedClass.id);
-                if (check.length === 0 || isForceMode) {
-                    this._confirmationWindow.setClassData(selectedActor, selectedClass, check.conditions);
+                const conditions = checkClassChangeConditions(selectedActor, selectedClass.id);
+                const checkResult = checkConditionResult(selectedActor, selectedClass.id,conditions);
+                if (checkResult || isForceMode) {
+                    this._confirmationWindow.setClassData(selectedActor, selectedClass, conditions);
                     this._confirmationWindow.show();
                     this._confirmationWindow.activate();
                     this._classListWindow.deactivate();
                 } else {
-                    $gameMessage.add(check[0].reason);
+                    $gameMessage.add(conditions[0].reason);
                 }
             }
         }
@@ -1836,8 +1833,8 @@
             
             if (isForceMode) return true;
             
-            const check = checkClassChangeConditions(this._actor, item.id);
-            return check.canChange;
+            const checkResult = checkConditionResult(this._actor, item.id);
+            return checkResult;
         }
         
         makeItemList() {
@@ -1893,9 +1890,8 @@
             
             if (isForceMode) return true;
             
-            const check = checkClassChangeConditions(this._actor, item.id);
-            const checkFalse = check.some(check => !check.canChange);
-            return !checkFalse;
+            const checkResult = checkConditionResult(this._actor, item.id);
+            return checkResult;
         }
         
         refresh() {
@@ -2066,11 +2062,10 @@
             }
             // 顯示職業描述
 
-            const check = checkClassChangeConditions(this._actor, targetClass.id);
-            const checkFalse = check.some(check => !check.canChange);
+            const checkResult = checkConditionResult(this._actor, targetClass.id);
 
 
-            const targetClassName = getClassName(this._actor,targetClass,checkFalse);
+            const targetClassName = getClassName(this._actor,targetClass,checkResult);
             // 顯示職業名稱
             this.changeTextColor(ColorManager.systemColor());
             this.contents.fontSize = 28;
@@ -2080,7 +2075,7 @@
             y += lineHeight * 1.5;
             contentHeight += lineHeight * 1.5;
             
-            if(checkFalse && hideUnchangeableClassDescription){
+            if(!checkResult && hideUnchangeableClassDescription){
                 return;
             }
             // 使用新的圖片查找邏輯 / Use new image finding logic / 新しい画像検索ロジックを使用
@@ -2181,7 +2176,7 @@
             // Display change conditions / 顯示轉職條件 / 転職条件を表示
             const conditions = getClassConditions(targetClass.id);
             const check = checkClassChangeConditions(this._actor, targetClass.id);
-            
+            const checkResult = checkConditionResult(this._actor, targetClass.id);
             y += lineHeight / 2;
             this.changeTextColor(ColorManager.systemColor());
             this.drawText(getText('changeConditions'), 0, y - this._scrollY, 200);
@@ -2191,7 +2186,7 @@
                 this.changeTextColor(ColorManager.powerUpColor());
                 this.drawText(getText('forceMode'), 20, y - this._scrollY, this.innerWidth - 20);
                 return;
-            }else if (check.length === 0 ) {
+            }else if (checkResult) {
                 this.changeTextColor(ColorManager.powerUpColor());
                 this.drawText(getText('allConditionsMet'), 20, y - this._scrollY, this.innerWidth - 20);
                 return;
