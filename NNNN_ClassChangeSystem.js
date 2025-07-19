@@ -2343,11 +2343,12 @@
             // Draw separator line / 繪製分隔線 / 区切り線を描画
             this.contents.fillRect(tableX, y - 2, tableWidth, 2, ColorManager.systemColor());
             y += 2;
+            const tempActorBefore = JsonEx.makeDeepCopy(this._actor);
             
             // Basic parameter comparison / 基本參數比較 / 基本パラメータ比較
             for (let i = 0; i < 8; i++) {
-                const currentValue = this._actor.param(i);
-                const newValue = tempActor.param(i);
+                const currentValue = this.actorParamWithoutEquip(i,tempActorBefore);
+                const newValue = this.actorParamWithoutEquip(i,tempActor);
                 const difference = newValue - currentValue;
                 
                 // Parameter name / 參數名稱 / パラメータ名
@@ -2377,8 +2378,38 @@
             
             y += 4;
             this.calculateMaxScroll(contentHeight);
-        }   
-     
+        }
+        currentParam(actor,paramId){
+            if(!actor){
+                actor = this._actor;
+            }
+            switch(paramId){
+                case 0:
+                    return actor.mhp;
+                case 1:
+                    return actor.mmp;
+                case 2:
+                    return actor.atk;
+                case 3:
+                    return actor.def;
+                case 4:
+                    return actor.mat;
+                case 5:
+                    return actor.mdf;
+                case 6:
+                    return actor.agi;
+                case 7:
+                    return actor.luk;
+            }
+        }
+        actorParamWithoutEquip(paramId,actor){
+            if(!actor){
+                actor = JsonEx.makeDeepCopy(this._actor);
+            }
+            actor.clearEquipments();
+            const currentTotalValue = this.currentParam(actor,paramId);
+            return currentTotalValue;
+        }
         drawSkillChangeTab() {
             let y = 0;
             let contentHeight = 0;
