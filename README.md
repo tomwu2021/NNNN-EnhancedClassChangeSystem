@@ -6,8 +6,7 @@
 **版本:** v1.3.0
 **作者:** NeNeNeNeTai  
 **類型:** 統一轉職系統解決方案  
-**更新狀態:** 正式版本，功能完整  
-**GitHub:** https://github.com/tomwu2021/NeNeNeNeTaiPlugin
+**更新狀態:** 正式版本，功能完整
 
 ---
 
