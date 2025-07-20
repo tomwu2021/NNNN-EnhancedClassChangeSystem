@@ -3,7 +3,7 @@
 //=============================================================================
 /*:
  * @target MZ
- * @plugindesc v1.000 Enhanced Class Change System
+ * @plugindesc v1.3.0 Enhanced Class Change System
  * @author NeNeNeNeTai
  * @url https://github.com/tomwu2021/NeNeNeNeTaiPlugin
  * @help NNNN_ClassChangeSystem.js
