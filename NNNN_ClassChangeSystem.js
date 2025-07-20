@@ -924,7 +924,7 @@
         }
         if (actor && targetClass) {
             if (isForce || checkClassChangeConditions(actor, classId).canChange) {
-                executeClassChange(actor, classId, isForce);
+                executeClassChange(actor, classId, isForce,true);
             } else {
                 $gameMessage.add(getText('insufficientResources'));
             }
@@ -1175,8 +1175,37 @@
         }
         return finalResult;
     }
-    
-    function executeClassChange(actor, targetClassId, force = false) {
+    function getSkillsAfterChangeClass(actor,classId, keepExp){
+        
+        const currentClass = actor.currentClass();
+        const currentLevel = actor.level;
+        
+        const tempActor = JsonEx.makeDeepCopy(actor);
+        tempActor.changeClass(classId, keepExp);
+        
+        const targetClass = $dataClasses[classId];
+        const targetClassLevel = tempActor.level;
+
+        const oldClassSkills = currentClass.learnings
+            .filter(learning => learning.level <= currentLevel)
+            .map(learning => learning.skillId);
+
+        const newClassSkills = targetClass.learnings
+            .filter(learning => learning.level <= targetClassLevel)
+            .map(learning => learning.skillId);
+
+        const nonClassSkills = actor._skills
+            .filter(skillId => !oldClassSkills.includes(skillId));
+        let afterSkills = [];
+        if (keepSkills) {
+            afterSkills = [...new Set([...oldClassSkills, ...nonClassSkills, ...newClassSkills])];
+        }else{
+            afterSkills = [...new Set([...nonClassSkills, ...newClassSkills])];
+        }
+        afterSkills.sort((a, b) => a - b);
+        return afterSkills;
+    }
+    function executeClassChange(actor, targetClassId, force = false,showMessage = false) {
         const targetClass = $dataClasses[targetClassId];
         const conditions = getClassConditions(targetClassId);
         
@@ -1197,38 +1226,20 @@
         }
         
         // Handle skill changes / 處理技能轉換 / スキル変更の処理
-        if (!keepSkills) {
-            const currentClass = actor.currentClass();
-            const currentLevel = actor.level;
-            
-            const oldClassSkills = currentClass.learnings
-                .filter(learning => learning.level <= currentLevel)
-                .map(learning => learning.skillId);
-            
-            const newClassSkills = targetClass.learnings
-                .filter(learning => learning.level <= currentLevel)
-                .map(learning => learning.skillId);
-            
-            actor._skills = actor._skills.filter(skillId => !oldClassSkills.includes(skillId));
-            
-            for (const skillId of newClassSkills) {
-                if (!actor._skills.includes(skillId)) {
-                    actor._skills.push(skillId);
-                }
-            }
-            
-            actor._skills.sort((a, b) => a - b);
-        }
+        const afterSkills = getSkillsAfterChangeClass(actor,targetClassId,keepExp);
+        actor._skills = afterSkills;
         
         // Execute class change / 執行轉職 / 転職実行
         actor.changeClass(targetClassId, keepExp);
-        
-        // Show success message / 顯示成功訊息 / 成功メッセージ表示
-        const message = getText('successMessage').replace('%1', actor.name()).replace('%2', targetClass.name);
-        $gameMessage.add(message);
-        
-        // Update class images / 更新職業圖像 / 職業画像更新
-        $gamePlayer.refresh();
+        if(showMessage){
+            // Show success message / 顯示成功訊息 / 成功メッセージ表示
+            const message = getText('successMessage').replace('%1', actor.name()).replace('%2', targetClass.name);
+            $gameMessage.add(message);
+            
+            // Update class images / 更新職業圖像 / 職業画像更新
+            $gamePlayer.refresh();
+        }
+
     }
     
     function findClassImage(classId) {
@@ -1684,7 +1695,7 @@
         }
         
         onConfirmOk() {
-            executeClassChange(selectedActor, selectedClass.id, isForceMode);
+            executeClassChange(selectedActor, selectedClass.id, isForceMode,true);
             
             selectedActor = null;
             selectedClass = null;
@@ -2281,30 +2292,6 @@
             let tempActor;
             try {
                 tempActor = JsonEx.makeDeepCopy(this._actor);
-                
-                if (!keepSkills) {
-                    const currentClass = tempActor.currentClass();
-                    const currentLevel = tempActor.level;
-                    
-                    const oldClassSkills = currentClass.learnings
-                        .filter(learning => learning.level <= currentLevel)
-                        .map(learning => learning.skillId);
-                    
-                    const newClassSkills = compareClass.learnings
-                        .filter(learning => learning.level <= currentLevel)
-                        .map(learning => learning.skillId);
-                    
-                    tempActor._skills = tempActor._skills.filter(skillId => !oldClassSkills.includes(skillId));
-                    
-                    for (const skillId of newClassSkills) {
-                        if (!tempActor._skills.includes(skillId)) {
-                            tempActor._skills.push(skillId);
-                        }
-                    }
-                    
-                    tempActor._skills.sort((a, b) => a - b);
-                }
-                
                 tempActor.changeClass(compareClass.id, keepExp);
             } catch (error) {
                 this.changeTextColor(ColorManager.powerDownColor());
@@ -2434,40 +2421,15 @@
             
 
             const lineHeight = this.lineHeight() - 2;
+            const tempActor = JsonEx.makeDeepCopy(this._actor);
+            executeClassChange(tempActor,compareClass.id,keepExp);
             
             // Get current and new skills / 獲取當前技能和轉職後技能 / 現在のスキルと転職後のスキルを取得
             const currentSkills = [...this._actor._skills];
-            let newSkills = [];
-            let removedSkills = [];
-            let addedSkills = [];
-            
-            if (keepSkills) {
-                const compareClassLevel = keepExp ? this._actor.level : 1;
-                const newClassSkills = compareClass.learnings
-                    .filter(learning => learning.level <= compareClassLevel)
-                    .map(learning => learning.skillId);
-                
-                addedSkills = newClassSkills.filter(skillId => !currentSkills.includes(skillId));
-                removedSkills = [];
-            } else {
-                const currentClass = this._actor.currentClass();
-                const currentLevel = this._actor.level;
-                
-                const oldClassSkills = currentClass.learnings
-                    .filter(learning => learning.level <= currentLevel)
-                    .map(learning => learning.skillId);
-                
-                const compareClassLevel = keepExp ? currentLevel : 1;
-                const newClassSkills = compareClass.learnings
-                    .filter(learning => learning.level <= compareClassLevel)
-                    .map(learning => learning.skillId);
-                
-                const nonClassSkills = currentSkills.filter(skillId => !oldClassSkills.includes(skillId));
-                newSkills = [...new Set([...nonClassSkills, ...newClassSkills])].sort((a, b) => a - b);
-                
-                removedSkills = currentSkills.filter(skillId => !newSkills.includes(skillId));
-                addedSkills = newSkills.filter(skillId => !currentSkills.includes(skillId));
-            }
+            const afterSkills = tempActor._skills;
+            let addedSkills = afterSkills.filter(skillId => !currentSkills.includes(skillId));
+            let removedSkills = currentSkills.filter(skillId => !afterSkills.includes(skillId));
+
             
             // Display title / 顯示標題 / タイトルを表示
             this.changeTextColor(ColorManager.systemColor());
