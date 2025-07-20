@@ -3,7 +3,7 @@
 ## 插件基本資訊 / プラグイン基本情報 / Plugin Basic Information
 
 **插件名稱:** NNNN_ClassChangeSystem  
-**版本:** v1.000  
+**版本:** v1.3.0
 **作者:** NeNeNeNeTai  
 **類型:** 統一轉職系統解決方案  
 **更新狀態:** 正式版本，功能完整  
@@ -15,45 +15,27 @@
 
 ### 繁體中文
 
-主要功能：
-
-- 統一的結構化參數配置系統，無需修改職業備註
-- 支援金錢和道具消耗的轉職機制
-- 詳細的職業轉換條件檢查（等級、參數、開關、自定義腳本）
-- 智能多語言支持（繁體中文、英文、日文自動檢測）
-- 現代化多標籤界面設計（職業介紹、轉職條件、能力比較、技能變化）
-- 職業圖像顯示系統
-- 職業重複控制功能（可設定是否允許多角色同職業）
-- 批量職業管理和強制轉職命令
-- 完整的確認流程和錯誤處理
+採用插件管理器參數配置，無需修改職業備註。
+提供完整轉職多標籤界面。
+支援金錢和道具消耗、詳細條件檢查、客製腳本條件。
+預設介面語言檢測(中英日)。
+職業圖像顯示、職業重複控制等功能。
 
 ### 日本語
 
-主要機能：
-
-- 統合された構造化パラメータ設定システム、職業メモの変更不要
-- 金銭とアイテム消費をサポートする転職メカニズム
-- 詳細な職業転換条件チェック（レベル、パラメータ、スイッチ、カスタムスクリプト）
-- インテリジェントな多言語サポート（繁体字中国語、英語、日本語自動検出）
-- 現代的なマルチタブインターフェースデザイン（職業紹介、転職条件、能力比較、スキル変化）
-- 職業画像表示システム
-- 職業重複制御機能（複数アクターの同職業を許可するかどうか設定可能）
-- バッチ職業管理と強制転職コマンド
-- 完全な確認フローとエラー処理
+プラグインマネージャーのパラメータ設定を採用し、職業メモの変更は不要。
+完全な転職マルチタブインターフェースを提供。
+金銭とアイテム消費、詳細な条件チェック、カスタムスクリプト条件をサポート。
+デフォルトインターフェース言語検出（中英日）。
+職業画像表示、職業重複制御などの機能。
 
 ### English
 
-Main Features:
-
-- Unified structured parameter configuration system, no need to modify class notes
-- Class change mechanism supporting gold and item consumption
-- Detailed class conversion condition checking (level, parameters, switches, custom scripts)
-- Intelligent multi-language support (Traditional Chinese, English, Japanese auto-detection)
-- Modern multi-tab interface design (Class Info, Conditions, Stats Comparison, Skill Changes)
-- Class image display system
-- Class duplication control feature (configurable whether to allow multiple actors with same class)
-- Batch class management and force class change commands
-- Complete confirmation flow and error handling
+Adopts plugin manager parameter configuration, no need to modify class notes.
+Provides complete class change multi-tab interface.
+Supports gold and item consumption, detailed condition checking, custom script conditions.
+Default interface language detection (Chinese, English, Japanese).
+Class image display, class duplication control and other features.
 
 ---
 
@@ -140,7 +122,7 @@ Main Features:
 
 ### 多語言文字自定義 / 多言語テキストカスタマイズ / Multi-language Text Customization
 
-系統支援自動語言檢測，同時允許自定義所有界面文字：
+系統支援自動語言檢測，同時允許自定義幾乎所有界面文字：
 
 - **menuCommand:** 菜單命令文字
 - **confirmMessage:** 確認訊息
@@ -368,31 +350,12 @@ Main Features:
 
 ## 注意事項 / 注意事項 / Notes
 
-### 重要提醒
+### 注意事項
 
-- 此插件為先行版本
-- 轉職會永久改變角色職業，建議提前備份存檔
-- 資源消耗是永久性的，轉職前請確認資源充足
-- 建議在正式使用前在測試環境中充分驗證配置
-
-### 遊戲平衡建議
-
-- **禁止重複職業功能**：建議設定 `AllowDuplicate` 為 false 以維持遊戲平衡
-- **職業條件設定**：為重要職業設定合理的轉職條件和成本
-- **資源消耗平衡**：金錢和道具消耗應與職業強度相匹配
-- **等級需求**：建議設定適當的等級需求避免過早轉職
-
-### 技術注意事項
-
-- 職業圖片檔案需放置在 `img/pictures` 資料夾中
-- 自定義腳本條件需要 JavaScript 基礎知識
-- 插件命令可用於事件中實現自動化轉職流程
-- 文字顯示參數已有中英日預設，其他語言可自定義
-
-### 兼容性說明
-
-- 兼容 RPG Maker MZ 標準功能
-- 只依賴於 RPG Maker MZ 核心系統
+1. 資源消耗是永久性的，轉職前請確認資源充足
+2. 職業圖片檔案需放置在 img/pictures 資料夾中
+3. 自定義腳本條件需要 JavaScript 基礎知識
+4. 兼容 RPG Maker MZ 標準功能
 
 ---
 
