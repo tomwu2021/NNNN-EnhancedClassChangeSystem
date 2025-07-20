@@ -1047,22 +1047,24 @@
     };
     function getCurrentValue(actor, paramKey) {
         const valueMap = {};
+        const tempActor = JsonEx.makeDeepCopy(actor);
+        tempActor.clearEquipments();
         valueMap[requiredParamNames.AllowedActors] = actor.actorId();
         valueMap[requiredParamNames.FromClasses] = actor.currentClass().id;
         valueMap[requiredParamNames.RequiredLevel] = actor.level;
-        valueMap[requiredParamNames.RequiredHp] = actor.param(0);
-        valueMap[requiredParamNames.RequiredMp] = actor.param(1);
-        valueMap[requiredParamNames.RequiredAtk] = actor.param(2);
-        valueMap[requiredParamNames.RequiredDef] = actor.param(3);
-        valueMap[requiredParamNames.RequiredMat] = actor.param(4);
-        valueMap[requiredParamNames.RequiredMdf] = actor.param(5);
-        valueMap[requiredParamNames.RequiredAgi] = actor.param(6);
-        valueMap[requiredParamNames.RequiredLuk] = actor.param(7);
+        valueMap[requiredParamNames.RequiredHp] = tempActor.param(0);
+        valueMap[requiredParamNames.RequiredMp] = tempActor.param(1);
+        valueMap[requiredParamNames.RequiredAtk] = tempActor.param(2);
+        valueMap[requiredParamNames.RequiredDef] = tempActor.param(3);
+        valueMap[requiredParamNames.RequiredMat] = tempActor.param(4);
+        valueMap[requiredParamNames.RequiredMdf] = tempActor.param(5);
+        valueMap[requiredParamNames.RequiredAgi] = tempActor.param(6);
+        valueMap[requiredParamNames.RequiredLuk] = tempActor.param(7);
         valueMap[requiredParamNames.GoldCost] = $gameParty.gold();
         valueMap[requiredParamNames.ItemCosts] = (id) => $gameParty.numItems($dataItems[id]);
         valueMap[requiredParamNames.RequiredSwitches] = (id) => $gameSwitches.value(id);
         valueMap[requiredParamNames.CustomScript] = (script,classId) => {
-            const a = actor;
+            const a = tempActor;
             const b = $dataClasses[classId];
             const scriptResult = eval(script);
             return scriptResult;
