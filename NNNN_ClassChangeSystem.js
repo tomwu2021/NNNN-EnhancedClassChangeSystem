@@ -1124,7 +1124,7 @@
                     if (currentGold < requiredGold) {
                         finalResult.push({ 
                             canChange: false, 
-                            reason: `${getText('errors.insufficientGold')} ${requiredGold}\\G (${getText('errors.current')}: ${currentGold}\\G)`
+                            reason: `${getText('errors.insufficientGold')}${requiredGold}${TextManager.currencyUnit} (${getText('errors.current')}: ${currentGold}${TextManager.currencyUnit})`
                         });
                     }
                 }
@@ -2346,13 +2346,13 @@
             const tempActorBefore = JsonEx.makeDeepCopy(this._actor);
             
             // Basic parameter comparison / 基本參數比較 / 基本パラメータ比較
-            for (let i = 0; i < 8; i++) {
-                const currentValue = this.actorParamWithoutEquip(i,tempActorBefore);
-                const newValue = this.actorParamWithoutEquip(i,tempActor);
+            for (let i = -1; i < 8; i++) {
+                const parameterName = i === -1 ? TextManager.basic(0) : TextManager.param(i);
+                const currentValue = i === -1 ? tempActorBefore.level : this.actorParamWithoutEquip(i,tempActorBefore);
+                const newValue = i === -1 ? tempActor.level : this.actorParamWithoutEquip(i,tempActor);
                 const difference = newValue - currentValue;
-                
                 // Parameter name / 參數名稱 / パラメータ名
-                this.drawText(TextManager.param(i), tableX, y, 70, 'center');
+                this.drawText(parameterName, tableX, y, 70, 'center');
                 
                 // Current value / 當前數值 / 現在の値
                 this.drawText(currentValue.toString(), tableX + columnSpace, y, 70, 'center');
